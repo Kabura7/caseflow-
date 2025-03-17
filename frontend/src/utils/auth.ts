@@ -14,6 +14,7 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
+
 }, 
 (error) => Promise.reject(error));
 
@@ -34,7 +35,7 @@ api.interceptors.response.use(
             Authorization: `Bearer ${refreshToken}`,
           },
         });
-        const { access_token } = response.data;
+        const { access_token } = response.data.data;
         localStorage.setItem("accessToken", access_token);
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
         return axios(originalRequest);
@@ -48,18 +49,95 @@ api.interceptors.response.use(
   }
 );
 
+interface Role {
+  name: string;
+}
+
+interface User {
+  email: string;
+  full_name: string;
+  roles: Role[];
+}
+
+interface Lawyer {
+  id: string;
+  name: string;
+  specialization: string;
+  experience: string;
+  imageUrl?: string;
+  rating: number;
+  casesHandled: number;
+  location: string;
+}
+
+interface FindLawyerResponse {
+  data: {
+    lawyers: Lawyer[];
+  };
+  message: string;
+  status: "success" | "error";
+}
+
 interface AuthResponse {
   data: {
     access_token: string;
     refresh_token: string;
-    user: {
-      id: string;
-      email: string;
-      firstName: string;
-      lastName: string;
-      roles: string[];
-    }
-  }
+    user: User;
+  };
+  message: string;
+  status: "success" | "error";
+}
+
+interface Case {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  status: 'Active' | 'Pending' | 'Closed' | 'On Hold';
+  lastUpdated: string;
+  lawyer?: {
+    name: string;
+    imageUrl?: string;
+  };
+  client?: {
+    name: string;
+    contactPerson: string;
+  };
+}
+
+interface GetCasesResponse {
+  data: {
+    cases: Case[];
+  };
+  message: string;
+  status: "success" | "error";
+}
+
+interface AvailableCasesResponse {
+  data: {
+    cases: Case[];
+  };
+  message: string;
+  status: "success" | "error";
+}
+
+interface HandleCaseResponse {
+  message: string;
+  status: "success" | "error";
+}
+
+interface Category {
+  id: string;
+  name: string;
+}
+
+interface GetAssignedCasesResponse {
+  data: {
+    cases: Case[];
+    categories: Category[];
+  };
+  message: string;
+  status: "success" | "error";
 }
 
 // API endpoints for authentication
@@ -82,4 +160,33 @@ export const authApi = {
     const backendUrl = "http://127.0.0.1:5000";
     return `${backendUrl}/auth/google?auth_type=${type}`;
   },
+  submitCase: (userId: string, formData: FormData) => {
+    return api.post(`/auth/client/case-submit/${userId }`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+  findLawyers: (specialization: string): Promise<FindLawyerResponse> => {
+    return api.post("/client/find-lawyer", {
+      specialization,
+    });
+  },
+  getCases: (userId: string): Promise<GetCasesResponse> => {
+    return api.get(`/client/get-cases/${userId}`);
+  },
+  // Get assigned cases for lawyers
+  getAssignedCases: (): Promise<GetAssignedCasesResponse> => {
+    return api.get("/lawyer/assigned-cases");
+  },
+  // Get available cases with categories
+  getAvailableCases: (): Promise<AvailableCasesResponse> => {
+    return api.get("/lawyer/available-case");
+  },
+  // Handle a specific case
+  handleCase: (caseId: string, userId: string): Promise<HandleCaseResponse> => {
+    return api.get(`/client/${caseId}/${userId}`);
+  },
 };
+
+export type { Lawyer, Case, Category };

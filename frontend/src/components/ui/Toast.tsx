@@ -1,4 +1,4 @@
-import React, { forwardRef, Component, ComponentPropsWithoutRef } from "react";
+import React, { forwardRef, ComponentPropsWithoutRef } from "react";
 import { X } from "lucide-react";
 import * as ToastPrimitives from "@radix-ui/react-toast";
 import { cn } from "../../utils/cn";

@@ -5,14 +5,14 @@ import { useNavigate } from "react-router-dom";
 
 export const UserProfile = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { logout, userRoles } = useAuth();
+  const { logout, userRoles, user } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        dropdownRef.current && !dropdownRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -20,11 +20,13 @@ export const UserProfile = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
   const handleUpdateProfile = () => {
     const baseRoute = userRoles[0] === "lawyer" ? "/lawyer" : "/client";
     navigate(`${baseRoute}/settings`);
     setIsOpen(false);
   };
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button
@@ -41,7 +43,7 @@ export const UserProfile = () => {
         <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
           <div className="py-1" role="menu">
             <div className="px-4 py-2 border-b border-gray-100">
-              <p className="text-sm font-medium text-gray-900">John Doe</p>
+              <p className="text-sm font-medium text-gray-900">{user?.firstname+" "+user?.lastname}</p>
               <p className="text-xs text-gray-500 capitalize">{userRoles[0]}</p>
             </div>
             <button

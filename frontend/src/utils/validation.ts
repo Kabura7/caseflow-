@@ -52,7 +52,6 @@ export const reportCaseSchema = z.object({
   description: z.string()
     .min(20, "Please provide a more detailed description")
     .max(1000, "Description must not exceed 1000 characters"),
-  category: z.string().optional(),
   urgencyLevel: z.enum(["Low", "Medium", "High"], {
     required_error: "Please select an urgency level",
   }),
@@ -68,14 +67,18 @@ export const reportCaseSchema = z.object({
         return Array.from(files).every(
           (file) =>
             file.size <= 10 * 1024 * 1024 && // 10MB
-            ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/jpeg"].includes(
-              file.type
-            )
+            [
+              "application/msword",
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+              "image/jpeg",
+            ].includes(file.type)
         );
       },
-      "Files must be less than 10MB and in PDF, DOCX, or JPEG format"
+      "Files must be less than 10MB and in DOC, DOCX, or JPEG format"
     ),
-  specialRequirements: z.string().max(500, "Special requirements must not exceed 500 characters").optional(),
+  specialRequirements: z.string()
+    .max(500, "Special requirements must not exceed 500 characters")
+    .optional(),
 });
 
 export type LoginFormData = z.infer<typeof loginSchema>;

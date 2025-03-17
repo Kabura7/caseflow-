@@ -1,73 +1,42 @@
-import React, { useMemo, useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { CaseCard } from '../../../components/CaseCard'
 import { authApi } from '../../../utils/auth'
-import { useAuth } from '../../../contexts/AuthContext'
-import { toast } from 'sonner'
-import { AlertCircle, CheckCircle } from 'lucide-react'
-export const AvailableCasesPage = () => {
-  const { user } = useAuth()
-  const queryClient = useQueryClient()
+import { AlertCircle } from 'lucide-react'
+export const AssignedCasesPage = () => {
+  const [statusFilter, setStatusFilter] = useState<string>('all')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const {
-    data: casesData,
+    data: assignedCasesData,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['availableCases'],
-    queryFn: () => authApi.getAvailableCases(),
+    queryKey: ['assignedCases'],
+    queryFn: () => authApi.getAssignedCases(),
   })
   const filteredCases = useMemo(() => {
-    if (!casesData?.data.cases) return []
-    return casesData.data.cases.filter((caseItem) => {
-      return categoryFilter === 'all' || caseItem.category === categoryFilter
+    if (!assignedCasesData?.data.cases) return []
+    return assignedCasesData.data.cases.filter((caseItem) => {
+      const matchesStatus =
+        statusFilter === 'all' || caseItem.status === statusFilter
+      const matchesCategory =
+        categoryFilter === 'all' || caseItem.category === categoryFilter
+      return matchesStatus && matchesCategory
     })
-  }, [casesData?.data.cases, categoryFilter])
-  const handleCaseMutation = useMutation({
-    mutationFn: (caseId: string) => {
-      if (!user?.id) throw new Error('User ID not found')
-      return authApi.handleCase(caseId, user.id)
-    },
-    onSuccess: () => {
-      toast(
-        <div className="flex items-center gap-2">
-          <CheckCircle className="h-5 w-5 text-green-500" />
-          <span className="font-medium">Case assigned successfully</span>
-        </div>,
-        {
-          position: 'bottom-right',
-        },
-      )
-      queryClient.invalidateQueries({
-        queryKey: ['availableCases'],
-      })
-    },
-    onError: (error) => {
-      toast(
-        <div className="flex items-center gap-2">
-          <AlertCircle className="h-5 w-5 text-red-500" />
-          <span className="font-medium">
-            {error instanceof Error ? error.message : 'Failed to handle case'}
-          </span>
-        </div>,
-        {
-          position: 'bottom-right',
-        },
-      )
-    },
-  })
-
+  }, [assignedCasesData?.data.cases, statusFilter, categoryFilter])
   if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Available Cases
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900">Assigned Cases</h2>
             <p className="text-sm text-gray-500 mt-1">
-              Cases that need legal representation
+              Cases currently assigned to you
             </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="h-10 w-32 bg-gray-200 rounded-md animate-pulse" />
+            <div className="h-10 w-32 bg-gray-200 rounded-md animate-pulse" />
           </div>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -108,7 +77,7 @@ export const AvailableCasesPage = () => {
       </div>
     )
   }
-  if (!casesData?.data.cases.length) {
+  if (!assignedCasesData?.data.cases.length) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
         <div className="text-center">
@@ -116,10 +85,10 @@ export const AvailableCasesPage = () => {
             <AlertCircle className="h-10 w-10 text-gray-400" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No case submitted
+            No cases assigned
           </h3>
           <p className="text-gray-500">
-            There are currently no cases available for review
+            You currently don't have any cases assigned to you
           </p>
         </div>
       </div>
@@ -129,23 +98,36 @@ export const AvailableCasesPage = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Available Cases</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Assigned Cases</h2>
           <p className="text-sm text-gray-500 mt-1">
-            Cases that need legal representation
+            Cases currently assigned to you
           </p>
         </div>
-        <select
-          className="text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
-          <option value="all">All Categories</option>
-          {casesData?.data.categories?.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center space-x-2">
+          <select
+            className="text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+          >
+            <option value="all">All Categories</option>
+            {assignedCasesData?.data.categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+          <select
+            className="text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">All Cases</option>
+            <option value="Active">Active</option>
+            <option value="Pending">Pending</option>
+            <option value="Closed">Closed</option>
+            <option value="On Hold">On Hold</option>
+          </select>
+        </div>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredCases.map((caseItem) => (
@@ -155,11 +137,13 @@ export const AvailableCasesPage = () => {
             title={`${caseItem.title} · ${caseItem.category}`}
             actionButton={
               <button
-                className="px-4 py-2 bg-black text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors disabled:bg-gray-400"
-                onClick={() => handleCaseMutation.mutate(caseItem.id)}
-                disabled={handleCaseMutation.isPending}
+                className="px-4 py-2 bg-black text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors"
+                onClick={() => {
+                  // This will be handled later with the API
+                  alert('Opening case details!')
+                }}
               >
-                {handleCaseMutation.isPending ? 'Processing...' : 'Handle Case'}
+                View Details
               </button>
             }
           />

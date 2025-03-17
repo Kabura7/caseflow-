@@ -119,7 +119,7 @@ export const lawyerNavItems: NavItem[] = [
   },
   {
     label: "My Assigned Cases",
-    path: "/lawyer/assigned",
+    path: "/lawyer/assigned-case",
     icon: <BriefcaseIcon className="h-5 w-5" />,
   },
   {

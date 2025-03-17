@@ -19,6 +19,8 @@ import { ReportCasePage } from "./pages/dashboard/client/ReportCasePage";
 import { ActiveCasesPage } from "./pages/dashboard/client/ActiveCasesPage";
 import { FindLawyerPage } from "./pages/dashboard/client/FindLawyerPage";
 import { AvailableCasesPage } from "./pages/dashboard/lawyer/AvailableCasesPage";
+import { AssignedCasesPage } from "./pages/dashboard/lawyer/AssignedCasePage";
+import { CalendarPage } from "./pages/dashboard/lawyer/CalendarPage";
 
 const queryClient = new QueryClient();
 
@@ -71,7 +73,9 @@ export function App() {
               }
             >
               <Route index element={<AvailableCasesPage />} />
-              <Route path="available" element={<AvailableCasesPage />} />
+              <Route path="available-case" element={<AvailableCasesPage />} />
+              <Route path="assigned-case" element={<AssignedCasesPage />} />
+              <Route path="calendar" element={<CalendarPage />} />
             </Route>
           </Routes>
         </AuthProvider>

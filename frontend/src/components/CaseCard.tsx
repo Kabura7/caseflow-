@@ -1,26 +1,22 @@
-import React, { useState } from "react";
-import { Badge } from "./ui/Badge";
-import { UserIcon } from "lucide-react";
-import { Dialog } from "./ui/Dialog";
-
-
+import React, { useState } from 'react'
+import { Badge } from './ui/Badge'
+import { UserIcon } from 'lucide-react'
+import { Dialog } from './ui/Dialog'
 export interface CaseCardProps {
-  title: string;
-  description: string;
-  status: "Active" | "Pending" | "Closed" | "On Hold";
+  title: string
+  description: string
+  status: 'Active' | 'Pending' | 'Closed' | 'On Hold'
   lawyer?: {
-    name: string;
-    imageUrl?: string;
-  };
+    name: string
+    imageUrl?: string
+  }
   client?: {
-    name: string;
-    contactPerson: string;
-  };
-  lastUpdated: string;
-  actionButton?: React.ReactNode;
+    name: string
+    contactPerson: string
+  }
+  lastUpdated: string
+  actionButton?: React.ReactNode
 }
-
-
 export const CaseCard = ({
   title,
   description,
@@ -30,21 +26,21 @@ export const CaseCard = ({
   lastUpdated,
   actionButton,
 }: CaseCardProps) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const getStatusColor = (status: CaseCardProps["status"]) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const getStatusColor = (status: CaseCardProps['status']) => {
     switch (status) {
-      case "Active":
-        return "bg-green-100 text-green-800";
-      case "Pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "Closed":
-        return "bg-gray-100 text-gray-800";
-      case "On Hold":
-        return "bg-red-100 text-red-800";
+      case 'Active':
+        return 'bg-green-100 text-green-800'
+      case 'Pending':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'Closed':
+        return 'bg-gray-100 text-gray-800'
+      case 'On Hold':
+        return 'bg-red-100 text-red-800'
       default:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800'
     }
-  };
+  }
   return (
     <>
       <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col h-full">
@@ -67,18 +63,30 @@ export const CaseCard = ({
             </p>
           </button>
         </div>
-        {(actionButton || client) && (
-          <div className="p-6 pt-0">
+        {(actionButton || client || lawyer) && (
+          <div className="p-6 pt-0 mt-auto">
             <div className="border-t border-gray-100 pt-4">
-              {client && (
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Client</p>
-                    <p className="text-sm text-gray-500">{client.name}</p>
-                  </div>
-                  {actionButton}
+              <div className="flex items-center justify-between">
+                <div>
+                  {client && (
+                    <>
+                      <p className="text-sm font-medium text-gray-900">
+                        Client
+                      </p>
+                      <p className="text-sm text-gray-500">{client.name}</p>
+                    </>
+                  )}
+                  {lawyer && (
+                    <>
+                      <p className="text-sm font-medium text-gray-900">
+                        Assigned Lawyer
+                      </p>
+                      <p className="text-sm text-gray-500">{lawyer.name}</p>
+                    </>
+                  )}
                 </div>
-              )}
+                {actionButton}
+              </div>
             </div>
           </div>
         )}
@@ -101,6 +109,12 @@ export const CaseCard = ({
               </p>
             </div>
           )}
+          {lawyer && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-md">
+              <p className="font-medium text-gray-900">Lawyer Information</p>
+              <p className="text-sm text-gray-500">Name: {lawyer.name}</p>
+            </div>
+          )}
           <div className="flex items-center justify-between pt-4 border-t border-gray-100">
             <div className="flex items-center space-x-2">
               <Badge className={getStatusColor(status)}>{status}</Badge>
@@ -112,5 +126,5 @@ export const CaseCard = ({
         </div>
       </Dialog>
     </>
-  );
-};
+  )
+}
