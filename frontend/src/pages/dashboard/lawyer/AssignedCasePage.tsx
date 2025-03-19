@@ -1,29 +1,56 @@
-import { useMemo, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { CaseCard } from '../../../components/CaseCard'
-import { authApi } from '../../../utils/auth'
-import { AlertCircle } from 'lucide-react'
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { CaseCard } from '../../../components/CaseCard';
+import { authApi } from '../../../utils/auth';
+import { AlertCircle } from 'lucide-react';
+import { formatDate } from '../../../utils/date'
+
+
+// Add this interface at the top of the file
+interface CaseItem {
+  id: string;
+  title: string;
+  description: string;
+  status: string;
+  category?: string;
+  client: string;
+  lawyer: string;
+  updated: string;
+}
+
 export const AssignedCasesPage = () => {
-  const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [categoryFilter, setCategoryFilter] = useState<string>('all')
-  const {
-    data: assignedCasesData,
-    isLoading,
-    error,
-  } = useQuery({
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+
+  const { data: assignedCasesData, isLoading, error } = useQuery({
     queryKey: ['assignedCases'],
-    queryFn: () => authApi.getAssignedCases(),
-  })
+    queryFn: async () => {
+      const response = await authApi.getAssignedCases();
+      return response?.data || { assigned_cases: []  as CaseItem[]}; // Ensure default value
+    },
+  });
+
+  const assignedCases = assignedCasesData?.assigned_cases || [] as CaseItem[]; // Default to empty array
+
   const filteredCases = useMemo(() => {
-    if (!assignedCasesData?.data.cases) return []
-    return assignedCasesData.data.cases.filter((caseItem) => {
-      const matchesStatus =
-        statusFilter === 'all' || caseItem.status === statusFilter
-      const matchesCategory =
-        categoryFilter === 'all' || caseItem.category === categoryFilter
-      return matchesStatus && matchesCategory
-    })
-  }, [assignedCasesData?.data.cases, statusFilter, categoryFilter])
+    return assignedCases.filter((caseItem: CaseItem) => {
+      const matchesStatus = statusFilter === 'all' || caseItem.status === statusFilter;
+      const caseCategory = caseItem.category || 'Uncategorized';
+      const matchesCategory = categoryFilter === 'all' || caseCategory === categoryFilter;
+      return matchesStatus && matchesCategory;
+    });
+  }, [assignedCases, statusFilter, categoryFilter]);
+
+  const uniqueCategories = useMemo(() => {
+    return Array.from(new Set(assignedCases.map((caseItem: CaseItem) => caseItem.category || 'Uncategorized')));
+  }, [assignedCases]);
+
+  const uniqueStatuses = useMemo(() => {
+    return Array.from(new Set(assignedCases.map((caseItem: CaseItem) => caseItem.status)));
+  }, [assignedCases]);
+
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -62,46 +89,39 @@ export const AssignedCasesPage = () => {
       </div>
     )
   }
+
   if (error) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Failed to load cases
-          </h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load cases</h3>
           <p className="text-gray-500">
             {error instanceof Error ? error.message : 'Please try again later'}
           </p>
         </div>
       </div>
-    )
+    );
   }
-  if (!assignedCasesData?.data.cases.length) {
+
+  if (!assignedCases.length) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
         <div className="text-center">
-          <div className="h-20 w-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="h-10 w-10 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No cases assigned
-          </h3>
-          <p className="text-gray-500">
-            You currently don't have any cases assigned to you
-          </p>
+          <AlertCircle className="h-10 w-10 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No cases assigned</h3>
+          <p className="text-gray-500">You currently don't have any cases assigned to you</p>
         </div>
       </div>
-    )
+    );
   }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Assigned Cases</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Cases currently assigned to you
-          </p>
+          <p className="text-sm text-gray-500 mt-1">Cases currently assigned to you</p>
         </div>
         <div className="flex items-center space-x-2">
           <select
@@ -110,10 +130,8 @@ export const AssignedCasesPage = () => {
             onChange={(e) => setCategoryFilter(e.target.value)}
           >
             <option value="all">All Categories</option>
-            {assignedCasesData?.data.categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
+            {uniqueCategories.map((category) => (
+              <option key={category} value={category}>{category}</option>
             ))}
           </select>
           <select
@@ -121,11 +139,10 @@ export const AssignedCasesPage = () => {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option value="all">All Cases</option>
-            <option value="Active">Active</option>
-            <option value="Pending">Pending</option>
-            <option value="Closed">Closed</option>
-            <option value="On Hold">On Hold</option>
+            <option value="all">All Statuses</option>
+            {uniqueStatuses.map((status) => (
+              <option key={status} value={status}>{status}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -133,15 +150,17 @@ export const AssignedCasesPage = () => {
         {filteredCases.map((caseItem) => (
           <CaseCard
             key={caseItem.id}
-            {...caseItem}
-            title={`${caseItem.title} · ${caseItem.category}`}
+            title={caseItem.title}
+            description={caseItem.description}
+            status={caseItem.status}
+            category={caseItem.category || 'Uncategorized'}
+            client={{ name: caseItem.client, contactPerson: caseItem.client }}
+            lawyer={{ name: caseItem.lawyer, imageUrl: undefined }}
+            lastUpdated={formatDate(caseItem.updated)}
             actionButton={
               <button
                 className="px-4 py-2 bg-black text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors"
-                onClick={() => {
-                  // This will be handled later with the API
-                  alert('Opening case details!')
-                }}
+                onClick={() => alert('Opening case details!')}
               >
                 View Details
               </button>
@@ -150,5 +169,5 @@ export const AssignedCasesPage = () => {
         ))}
       </div>
     </div>
-  )
-}
+  );
+};

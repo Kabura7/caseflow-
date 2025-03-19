@@ -16,6 +16,7 @@ import { authApi } from "../../utils/auth"
 import { useAuth } from "../../contexts/AuthContext";
 import { useMutation } from "@tanstack/react-query";
 import LoadingPage from "../../components/LoadingPage";
+import { error } from "console";
 
 export function Login() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -36,9 +37,12 @@ export function Login() {
       return authApi.login(data)
     },
     onSuccess: (response) => {
-      const { access_token, refresh_token, user } = response.data
+      const { access_token, refresh_token, user } = response.data.data
       login(access_token, refresh_token, user)
+      
     },
+
+    onError : (error) => console.log(error)
   })
 
   // Handle Form submission

@@ -3,7 +3,7 @@ import { LoginFormData, SignupFormData, ForgotPasswordFormData } from "./validat
 
 // Create axios instance with default config
 export const api = axios.create({
-  baseURL: "http://127.0.0.1:5000/api",
+  baseURL: "/api",
   withCredentials: true,
 });
 
@@ -14,7 +14,6 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
-
 }, 
 (error) => Promise.reject(error));
 
@@ -92,33 +91,19 @@ interface Case {
   id: string;
   title: string;
   description: string;
-  category: string;
+  category: string | null;
   status: 'Active' | 'Pending' | 'Closed' | 'On Hold';
-  lastUpdated: string;
-  lawyer?: {
-    name: string;
-    imageUrl?: string;
-  };
-  client?: {
-    name: string;
-    contactPerson: string;
-  };
+  client: string;
+  lawyer: string | null;
 }
 
 interface GetCasesResponse {
-  data: {
-    cases: Case[];
-  };
-  message: string;
-  status: "success" | "error";
+  data: Case[];
+  status: "success";
 }
 
 interface AvailableCasesResponse {
-  data: {
-    cases: Case[];
-  };
-  message: string;
-  status: "success" | "error";
+  available_cases: Case[];
 }
 
 interface HandleCaseResponse {
@@ -131,13 +116,20 @@ interface Category {
   name: string;
 }
 
+interface AssignedCase {
+  id: string;
+  title: string;
+  description: string;
+  category: string | null;
+  status: string;
+  client: string;
+  lawyer: string;
+  updated: string;
+}
+
 interface GetAssignedCasesResponse {
-  data: {
-    cases: Case[];
-    categories: Category[];
-  };
-  message: string;
-  status: "success" | "error";
+  data: { assigned_cases: never[]; };
+  assigned_cases: AssignedCase[];
 }
 
 // API endpoints for authentication
@@ -147,7 +139,7 @@ export const authApi = {
   },
   signup: (data: Omit<SignupFormData, "confirmPassword">): Promise<AuthResponse> => {
     // const { confirmPassword, ...signupData } = data;
-    return api.post("/auth/signup", data);
+    return api.post("/auth/register", data);
   },
   forgotPassword: (data: ForgotPasswordFormData) => {
     return api.post("/auth/forgot-password", data);
@@ -161,7 +153,7 @@ export const authApi = {
     return `${backendUrl}/auth/google?auth_type=${type}`;
   },
   submitCase: (userId: string, formData: FormData) => {
-    return api.post(`/auth/client/case-submit/${userId }`, formData, {
+    return api.post(`/client/case-submit/${userId}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -173,7 +165,7 @@ export const authApi = {
     });
   },
   getCases: (userId: string): Promise<GetCasesResponse> => {
-    return api.get(`/client/get-cases/${userId}`);
+    return api.get(`/client/cases/${userId}`);
   },
   // Get assigned cases for lawyers
   getAssignedCases: (): Promise<GetAssignedCasesResponse> => {
@@ -184,8 +176,8 @@ export const authApi = {
     return api.get("/lawyer/available-case");
   },
   // Handle a specific case
-  handleCase: (caseId: string, userId: string): Promise<HandleCaseResponse> => {
-    return api.get(`/client/${caseId}/${userId}`);
+  handleCase: (caseId: string): Promise<HandleCaseResponse> => {
+    return api.get(`/lawyer/handle-cases/${caseId}`);
   },
 };
 

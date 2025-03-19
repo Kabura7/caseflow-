@@ -1,7 +1,5 @@
-// import React from "react";
+
 import { BrowserRouter,  Routes, Route, Navigate } from "react-router-dom";
-// import { Header } from "./components/Header";
-// import { Footer } from "./components/Footer";
 import { Home } from "./pages/Home";
 import { Services } from "./pages/Services";
 import { Contact } from "./pages/Contact";
@@ -54,9 +52,9 @@ export function App() {
             <Route
               path="/client"
               element={
-                // <ProtectedRoute allowedRoles={["client"]}>
+                <ProtectedRoute allowedRoles={["client"]}>
                   <ClientDashboard />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               }
             >
               <Route index element={<ReportCasePage />} />
@@ -67,9 +65,9 @@ export function App() {
             <Route
               path="/lawyer"
               element={
-                // <ProtectedRoute allowedRoles={["lawyer"]}>
+                <ProtectedRoute allowedRoles={["lawyer"]}>
                   <LawyerDashboard />
-                // </ProtectedRoute>
+                </ProtectedRoute>
               }
             >
               <Route index element={<AvailableCasesPage />} />
@@ -77,6 +75,8 @@ export function App() {
               <Route path="assigned-case" element={<AssignedCasesPage />} />
               <Route path="calendar" element={<CalendarPage />} />
             </Route>
+
+            <Route path="*" element={<NotFoundRedirect/>}/>
           </Routes>
         </AuthProvider>
     </BrowserRouter>;

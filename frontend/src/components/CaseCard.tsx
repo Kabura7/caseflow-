@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { Badge } from './ui/Badge'
-import { UserIcon } from 'lucide-react'
 import { Dialog } from './ui/Dialog'
 export interface CaseCardProps {
   title: string
   description: string
-  status: 'Active' | 'Pending' | 'Closed' | 'On Hold'
+  status: 'Active' | 'Pending' | 'Closed' | 'Under Review' | 'On Hold'
+  category?: string | null
   lawyer?: {
     name: string
     imageUrl?: string
@@ -21,6 +21,7 @@ export const CaseCard = ({
   title,
   description,
   status,
+  category,
   lawyer,
   client,
   lastUpdated,
@@ -47,7 +48,14 @@ export const CaseCard = ({
         <div className="p-6 flex-1">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {title}
+                {category && (
+                  <span className="ml-2 text-sm text-gray-500">
+                    · {category}
+                  </span>
+                )}
+              </h3>
               <p className="text-sm text-gray-500 mt-1">
                 Last updated: {lastUpdated}
               </p>

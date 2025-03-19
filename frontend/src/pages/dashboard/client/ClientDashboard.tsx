@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { DashboardLayout } from "../../../components/layouts/DashboardLayout";
 import { clientNavItems } from "../../../utils/navigationItems";
 import { Outlet } from "react-router-dom";
+
 export const ClientDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     return window.innerWidth >= 1024;

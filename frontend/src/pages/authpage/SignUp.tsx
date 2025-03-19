@@ -57,12 +57,16 @@ export function SignUp() {
         },
       })
     },
+
+    onError: (error) => console.log(error)
   })
 
   // Asynchronous form submisson to handle signup form submission
   const onSubmit = (data: SignupFormData) => {
     signupMutation.mutate(data);
+    // console.log(data)
   };
+
   if (signupMutation.isPending) {
     return <LoadingPage />;
   }

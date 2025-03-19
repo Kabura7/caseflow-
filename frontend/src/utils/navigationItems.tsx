@@ -49,39 +49,7 @@ export const clientNavItems: NavItem[] = [
   {
     type: "divider",
   } as NavItem,
-  // Communications
-  {
-    type: "section",
-    sectionName: "Communications",
-  } as NavItem,
-  {
-    label: "Consultations",
-    path: "/client/schedule",
-    icon: <PhoneIcon className="h-5 w-5" />,
-  },
-  {
-    label: "Messages",
-    path: "/client/messages",
-    icon: <MessagesSquareIcon className="h-5 w-5" />,
-  },
-  {
-    type: "divider",
-  } as NavItem,
-  // Resources
-  {
-    type: "section",
-    sectionName: "Resources",
-  } as NavItem,
-  {
-    label: "Documents",
-    path: "/client/documents",
-    icon: <FileTextIcon className="h-5 w-5" />,
-  },
-  {
-    label: "Legal Resources",
-    path: "/client/resources",
-    icon: <NewspaperIcon className="h-5 w-5" />,
-  },
+  
   {
     label: "Help Center",
     path: "/client/help",
@@ -91,15 +59,7 @@ export const clientNavItems: NavItem[] = [
     type: "divider",
   } as NavItem,
   // Billing
-  {
-    type: "section",
-    sectionName: "Billing",
-  } as NavItem,
-  {
-    label: "Payments",
-    path: "/client/payments",
-    icon: <CreditCardIcon className="h-5 w-5" />,
-  },
+  
   {
     label: "Settings",
     path: "/client/settings",
@@ -123,87 +83,24 @@ export const lawyerNavItems: NavItem[] = [
     icon: <BriefcaseIcon className="h-5 w-5" />,
   },
   {
-    label: "Case Archive",
-    path: "/lawyer/archive",
-    icon: <FolderIcon className="h-5 w-5" />,
-  },
-  {
     type: "divider",
   } as NavItem,
   // Schedule
-  {
-    type: "section",
-    sectionName: "Schedule",
-  } as NavItem,
+
   {
     label: "Calendar",
     path: "/lawyer/calendar",
     icon: <CalendarIcon className="h-5 w-5" />,
   },
   {
-    label: "Court Dates",
-    path: "/lawyer/court-dates",
-    icon: <ScaleIcon className="h-5 w-5" />,
-  },
-  {
     type: "divider",
-  } as NavItem,
-  // Client Management
-  {
-    type: "section",
-    sectionName: "Clients",
   } as NavItem,
   {
     label: "Client Directory",
     path: "/lawyer/clients",
     icon: <UserIcon className="h-5 w-5" />,
   },
-  {
-    label: "Messages",
-    path: "/lawyer/communications",
-    icon: <MessagesSquareIcon className="h-5 w-5" />,
-  },
-  {
-    type: "divider",
-  } as NavItem,
-  // Documents
-  {
-    type: "section",
-    sectionName: "Documents",
-  } as NavItem,
-  {
-    label: "Case Documents",
-    path: "/lawyer/documents",
-    icon: <FileTextIcon className="h-5 w-5" />,
-  },
-  {
-    label: "Legal Templates",
-    path: "/lawyer/templates",
-    icon: <FileIcon className="h-5 w-5" />,
-  },
-  {
-    type: "divider",
-  } as NavItem,
-  // Practice Management
-  {
-    type: "section",
-    sectionName: "Practice Management",
-  } as NavItem,
-  {
-    label: "Time Tracking",
-    path: "/lawyer/time-tracking",
-    icon: <ClockIcon className="h-5 w-5" />,
-  },
-  {
-    label: "Billing",
-    path: "/lawyer/billing",
-    icon: <CreditCardIcon className="h-5 w-5" />,
-  },
-  {
-    label: "Analytics",
-    path: "/lawyer/analytics",
-    icon: <BarChart3Icon className="h-5 w-5" />,
-  },
+  
   {
     label: "Settings",
     path: "/lawyer/settings",
